@@ -1,10 +1,20 @@
-
 from collections import defaultdict
 
 DEPARTMENT_LIST = ["Biotech", "Chemistry", "Engineering", "Mathematics", "Physics"]
 
+department_exam = {"Biotech": [0, 1], "Chemistry": [1], "Engineering": [2, 3], "Mathematics": [2], "Physics": [0, 2]}
 
-department_exam = {"Biotech":1, "Chemistry":1, "Engineering":3, "Mathematics":2, "Physics":0}
+
+def get_mean(exam_scores, which):
+    # m = exam_scores[which[0]]
+    # if len(which) > 1:
+    m = 0
+    for i in range(len(which)):
+        m += exam_scores[which[i]]
+
+    return m / len(which)
+
+# print(get_mean([10,20,30] , [1]))
 
 def main():
     # n, m = int(input()), int(input())  # int()
@@ -27,7 +37,7 @@ def main():
     for i in range(3):
         # dept = ss[2][i]
         # exam =department_exam[dept]
-        students.sort(key=lambda ss: (ss[2][i],-ss[1][department_exam[ss[2][i]]],  ss[0]))
+        students.sort(key=lambda ss: (ss[2][i], -get_mean (ss[1],department_exam[ss[2][i]]), ss[0]))
         # for s in students:
         #     print("*******",s)
         not_qualified = []
@@ -50,11 +60,12 @@ def main():
 
     for department in DEPARTMENT_LIST:
         student_list = departments[department]
-        student_list.sort(key=lambda stu: (-stu[1][department_exam[department]], stu[0]))
+        student_list.sort(key=lambda stu: (- get_mean(stu[1],department_exam[department]), stu[0]))
         print(department)
-        # selected = student_list[:m]
-        for s in student_list:
-            print(f"{s[0]} {s[1][department_exam[department]]}")
+        with open(f'{department}.txt','w') as f:
+            # selected = student_list[:m]
+            for s in student_list:
+                f.write(f"{s[0]} {get_mean(s[1],department_exam[department])}\n")
 
         print()
 
