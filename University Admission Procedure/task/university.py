@@ -1,73 +1,47 @@
 from collections import defaultdict
 
 DEPARTMENT_LIST = ["Biotech", "Chemistry", "Engineering", "Mathematics", "Physics"]
-
 department_exam = {"Biotech": [0, 1], "Chemistry": [1], "Engineering": [2, 3], "Mathematics": [2], "Physics": [0, 2]}
 
 
 def get_mean(exam_scores, which):
-    # m = exam_scores[which[0]]
-    # if len(which) > 1:
     m = 0
     for i in range(len(which)):
         m += exam_scores[which[i]]
 
     return m / len(which)
 
-# print(get_mean([10,20,30] , [1]))
+
+def get_best(exam_scores, which):
+    return max(get_mean(exam_scores, which), exam_scores[-1])
+
 
 def main():
-    # n, m = int(input()), int(input())  # int()
-    # m = input()  # int()
-    # print(f"*{n}*{m}*")
-    # students = [(f"{x} {y}", z) for _ in range(1) for x, y, z in input().split()]
     m = int(input())
     students = []
     departments = defaultdict(list)
     with open('applicants.txt', 'r') as f:
         for line in f:
-            x, y, phy, chem, math, cs, u1, u2, u3 = line.split()
-            students.append((f"{x} {y}", (float(phy), float(chem), float(math), float(cs)), (u1, u2, u3)))
-            # departments.setdefault(u1, []).append(student)
-            # departments[u1] += 1
-    # departments = sorted(departments,key=lambda x:x[0])
-    # for s in students:
-    #     print(s)
-
+            x, y, phy, chem, math, cs, adm, u1, u2, u3 = line.split()
+            students.append((f"{x} {y}", (float(phy), float(chem), float(math), float(cs), float(adm)), (u1, u2, u3)))
     for i in range(3):
-        # dept = ss[2][i]
-        # exam =department_exam[dept]
-        students.sort(key=lambda ss: (ss[2][i], -get_mean (ss[1],department_exam[ss[2][i]]), ss[0]))
-        # for s in students:
-        #     print("*******",s)
+        students.sort(key=lambda ss: (ss[2][i], -get_best(ss[1], department_exam[ss[2][i]]), ss[0]))
         not_qualified = []
         while len(students) > 0:
             stu = students.pop(0)
             u = stu[2][i]
-            # print(stu)
-            if len(departments[u]) < m:  # and departments[u1]) < m:
+            if len(departments[u]) < m:
                 departments[u].append(stu)
             else:
                 not_qualified.append(stu)
-            # elif len(departments[u2]) < m:  # and departments[u1]) < m:
-            #     departments[u2].append(stu)
-            # elif len(departments[u3]) < m:  # and departments[u1]) < m:
-            #     departments[u3].append(stu)
         students = [] + not_qualified
-        # for s in students:
-        #     print("-----",s)
-    # print(departments)
 
     for department in DEPARTMENT_LIST:
         student_list = departments[department]
-        student_list.sort(key=lambda stu: (- get_mean(stu[1],department_exam[department]), stu[0]))
-        print(department)
-        with open(f'{department}.txt','w') as f:
-            # selected = student_list[:m]
+        student_list.sort(key=lambda stu: (- get_best(stu[1], department_exam[department]), stu[0]))
+        with open(f'{department}.txt', 'w') as f:
             for s in student_list:
-                f.write(f"{s[0]} {get_mean(s[1],department_exam[department])}\n")
-
-        print()
+                f.write(f"{s[0]} {get_best(s[1], department_exam[department])}\n")
 
 
 main()
